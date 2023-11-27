@@ -721,9 +721,9 @@
           dictionary["t"] = 1;
           dictionary["am"] = motorVal;
           dictionary["as"] = sensorVal;
-          console.log(`PRINTING MSG: ${JSON.stringify(dictionary)}`)
-          window.pyrepl.write = JSON.stringify(dictionary);
-          console.log("ADD VALUE JSON");
+          //console.log(`PRINTING MSG: ${JSON.stringify(dictionary)}`)
+          //window.pyrepl.write = JSON.stringify(dictionary);
+          //console.log("ADD VALUE JSON");
         }
 
         //add new data point to js arrays
@@ -801,8 +801,8 @@
         dictionary["st"] = "t";
         dictionary["t"] = 1;
         dictionary["di"] = i; //delete index
-          console.log(`PRINTING MSG: ${JSON.stringify(dictionary)}`)
-        window.pyrepl.write = JSON.stringify(dictionary);
+        //console.log(`PRINTING MSG: ${JSON.stringify(dictionary)}`)
+        //window.pyrepl.write = JSON.stringify(dictionary);
 
         //stop highlighting the point that is deleted
         hoverDeleteIndex = -1;
@@ -845,8 +845,8 @@
           var dictionary = {};
           dictionary["st"] = "p";
           dictionary["r"] = 1;
-          console.log(`PRINTING MSG: ${JSON.stringify(dictionary)}`)
-          window.pyrepl.write = JSON.stringify(dictionary);
+          //console.log(`PRINTING MSG: ${JSON.stringify(dictionary)}`)
+          //window.pyrepl.write = JSON.stringify(dictionary);
 
           //change the button text and color
           button.value = "Stop";
@@ -861,8 +861,8 @@
         var dictionary = {};
         dictionary["st"] = status;
         dictionary["r"] = 0;
-          console.log(`PRINTING MSG: ${JSON.stringify(dictionary)}`)
-        window.pyrepl.write = JSON.stringify(dictionary);
+        //  console.log(`PRINTING MSG: ${JSON.stringify(dictionary)}`)
+        //window.pyrepl.write = JSON.stringify(dictionary);
 
         //change the button text and color
         button.value = "Start";
@@ -882,6 +882,16 @@
         }
       }
 
+      let lastP = 0
+      let lastI = 0
+      let lastD = 0
+      let lastR = 0
+
+      function didParamsChange(p, i, d, r) {
+        // return (p != lastP) || (i != lastI) || (d != lastD) || (r != lastR)
+        return (r != lastR)
+      }
+
       function runSerial() {
         // should already be connected, but lets double cehck
         if (window.pyrepl && window.pyrepl.isActive) {
@@ -891,13 +901,19 @@
           var r = document.getElementById("start").value === "Stop"? 1 : 0
           console.log(`PID r: ${p}, ${i}, ${d}, ${r}`)
 
-          var dictionary = {};
-          dictionary["p"] = p;
-          dictionary["i"] = i;
-          dictionary["d"] = d;
-          dictionary["r"] = r;
-          console.log(`PRINTING MSG: ${JSON.stringify(dictionary)}`)
-          window.pyrepl.write = JSON.stringify(dictionary);
+          if (didParamsChange(p, i, d, r)) {
+            var dictionary = {};
+            dictionary["p"] = p;
+            dictionary["i"] = i;
+            dictionary["d"] = d;
+            dictionary["r"] = r;
+            console.log(`PIDR CHANGED. PRINTING MSG: ${JSON.stringify(dictionary)}`)
+            window.pyrepl.write = JSON.stringify(dictionary);
+          }
+          lastP = p
+          lastI = i
+          lastD = d
+          lastR = r
 
           var received = window.pyrepl.read;
           //get the last line of the serial reading
