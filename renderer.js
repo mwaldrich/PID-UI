@@ -1,3 +1,28 @@
+// Rendering constants: what let us make sense of the random numbers.
+// All distances, diameters, radii, and other dimensions are strictly in
+// MILLIMETERS.
+
+const beamWidth = 200//mm
+const beamHeight = 10//mm
+
+const ballDiameter = 10//mm
+
+const viewportWidth = 450//mm
+const viewportHeight = 350//mm (yes, the viewport dimensions are in mm)
+
+// Scaling factors. These scalars relate the raw numbers from the sensors
+// into millimeters.
+const motorScale = 1 // unit(s) of motor movement = 1mm
+const sensorScale = 1 // unit(s) of sensor movement = 1mm
+
+// The viewport scale relates each physical pixel to the size of a mm.
+// Bump this up to increase the *quality* of the render.
+const viewportScale = 1//pixel(s)^2 = 1mm
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Actual rendering logic below
+
 class Renderer {
     // Construct a new renderer, rendering onto the given canvas `c`.
     // `type` should be 'live' or 'sim'
@@ -46,11 +71,16 @@ class Renderer {
         }
     }
 
-    // m=motor, how much the motor on the left is extended. Normalized, out of 100
-    // s=sensor, how far away the ball is from the left edge of the beam. Normalized, out of 100
-    redraw(m, s) {
+    // m=motor, how much the motor on the left is extended.
+    // s=sensor, how far away the ball is from the left edge of the beam.
+    // These values are RAW, as in, they come directly from the robot.
+    redraw(rawM, rawS) {
       console.log("Render redraw.");
+      console.log(`rawM=${rawM} rawS=${rawS}`)
+      const m = rawM * motorScale
+      const s = rawS * sensorScale
       console.log(`m=${m} s=${s}`)
+
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
       // Draw the beam
@@ -60,14 +90,48 @@ class Renderer {
       this.drawBall(m, s)
     }
 
+    drawBeam(m) {
+      let [startX, startY, endX, endY] = this.beamCoords(m)
+      this.ctx.beginPath();
+      this.ctx.lineWidth = 4;
+      this.ctx.strokeStyle = "#FFD65C";
+      this.ctx.moveTo(startX, startY);
+      this.ctx.lineTo(endX, endY);
+      this.ctx.stroke();
+    }
+
+    drawBall(m, s) {
+      // Radius of the ball
+      const r = 10
+      const [pointX, pointY] = this.ballCoords(m, s, r)
+      console.log(`Ball distance: ${s}`)
+      console.log(`Ball coordinates: ${pointX}, ${pointY}`)
+      this.ctx.beginPath()
+      this.ctx.arc(pointX, pointY, r, r, 0, 2 * Math.PI, false)
+      this.ctx.fillStyle = "#FF0000"
+      this.ctx.fill()
+      // this.ctx.ellipse()
+      this.ctx.strokeStyle = "#FF0000"
+      this.ctx.stroke()
+    }
+
+
     // Given the motor position, returns:
     // [startX, startY, endX, endY]
-    // as the GRAPHICAL coordinates in the canvas of the beam
+    // as the PHYSICAL coordinates (in mm) of the beam
     beamCoords(m) {
-      console.log(`Canvas Size: ${this.canvas.width}x${this.canvas.height}`)
-      const coords = [this.convertX(10), this.convertY(m), this.convertX(90), this.convertY(50)]
-      console.log(`Beam coords: ${coords}`)
-      return coords
+        // Center (x, y) in mm
+        let [cx, cy] = this.centerOfCanvas()
+
+        const coords = [cx - beamWidth/2, cy-(m),   cx + beamWidth/2, cy]
+        // const coords = [this.convertX(10), this.convertY(m), this.convertX(90), this.convertY(50)]
+        console.log(`Beam physical coords: ${coords}`)
+        return coords
+    }
+
+    // Returns [x, y] of the *center* of the canvas, in mm.
+    centerOfCanvas() {
+        return [viewportWidth/2, viewportHeight/2]
     }
 
     // From chatGPT because I forgot trig
@@ -111,31 +175,6 @@ class Renderer {
 
       // Find where the ball should go.
       return this.findPointOnLineWithBall(startX, startY, endX, endY, s, r)
-    }
-
-    drawBeam(m) {
-      let [startX, startY, endX, endY] = this.beamCoords(m)
-      this.ctx.beginPath();
-      this.ctx.lineWidth = 4;
-      this.ctx.strokeStyle = "#FFD65C";
-      this.ctx.moveTo(startX, startY);
-      this.ctx.lineTo(endX, endY);
-      this.ctx.stroke();
-    }
-
-    drawBall(m, s) {
-      // Radius of the ball
-      const r = 10
-      const [pointX, pointY] = this.ballCoords(m, s, r)
-      console.log(`Ball distance: ${s}`)
-      console.log(`Ball coordinates: ${pointX}, ${pointY}`)
-      this.ctx.beginPath()
-      this.ctx.arc(pointX, pointY, r, r, 0, 2 * Math.PI, false)
-      this.ctx.fillStyle = "#FF0000"
-      this.ctx.fill()
-      // this.ctx.ellipse()
-      this.ctx.strokeStyle = "#FF0000"
-      this.ctx.stroke()
     }
 
     highlightDelete(i) {
