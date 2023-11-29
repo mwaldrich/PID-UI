@@ -3,7 +3,7 @@
 // MILLIMETERS.
 
 const beamWidth = 200//mm
-const beamHeight = 10//mm
+const beamHeight = 5//mm
 
 const ballDiameter = 10//mm
 
@@ -12,12 +12,12 @@ const viewportHeight = 350//mm (yes, the viewport dimensions are in mm)
 
 // Scaling factors. These scalars relate the raw numbers from the sensors
 // into millimeters.
-const motorScale = 1 // unit(s) of motor movement = 1mm
-const sensorScale = 1 // unit(s) of sensor movement = 1mm
+const motorScale = /* 1mm = */ 0.06 /* unit(s) of motor movement */
+const sensorScale = /* 1mm = */ 1 /* unit(s) of sensor movement */
 
 // The viewport scale relates each physical pixel to the size of a mm.
 // Bump this up to increase the *quality* of the render.
-const viewportScale = 1//pixel(s)^2 = 1mm
+let viewportScale = 2//pixel(s)^2 = 1mm
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -39,7 +39,9 @@ class Renderer {
         // The current frame we are rendering
         this.frame = 0
 
-        // The current ball velocity
+        // The current ball position & velocity
+        this.ballX = null
+        this.ballY = null
         this.velocityX = null
         this.velocityY = null
 
@@ -75,14 +77,21 @@ class Renderer {
     // s=sensor, how far away the ball is from the left edge of the beam.
     // These values are RAW, as in, they come directly from the robot.
     redraw(rawM, rawS) {
+        // Determine the new `viewportScale` depending on
+        // the current width of the canvas.
+        viewportScale = this.canvas.width / viewportWidth
+
       console.log("Render redraw.");
       console.log(`rawM=${rawM} rawS=${rawS}`)
-      const m = rawM * motorScale
-      const s = rawS * sensorScale
+      const m = rawM / motorScale
+      const s = rawS / sensorScale
       console.log(`m=${m} s=${s}`)
 
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+      this.updateBallPositionAndVelocity(m, s)
+
+      // debugger
       // Draw the beam
       this.drawBeam(m)
 
@@ -90,24 +99,55 @@ class Renderer {
       this.drawBall(m, s)
     }
 
+    updateBallPositionAndVelocity(m, s) {
+        // If the sensor detected the ball on the beam...
+        if (s) {
+            // Get new coordinates
+            let [ballX, ballY] = this.ballCoords(m, s)
+
+            // Calculate velocity from last frame
+            this.velocityX = ballX - this.ballX
+            this.velocityY = ballY - this.ballY
+
+            // Update coordinates
+            this.ballX = ballX
+            this.ballY = ballY
+        } else {
+            // Otherwise, the ball is in freefall.
+            // Just update the ballX and ballY according to "gravity".
+            this.ballX += this.velocityX
+            this.ballY += 0.1
+            this.ballY *= 1.007
+
+            return [this.ballX, this.ballY]
+        }
+    }
+
+    pixelCoord(p) {
+        return p * viewportScale
+    }
+
     drawBeam(m) {
-      let [startX, startY, endX, endY] = this.beamCoords(m)
+        // PX & PY are pixel X and pixel Y (coordinates in canvas)
+      let [startPX, startPY, endPX, endPY] = this.beamCoords(m).map(this.pixelCoord)
       this.ctx.beginPath();
-      this.ctx.lineWidth = 4;
+      this.ctx.lineWidth = beamHeight;
       this.ctx.strokeStyle = "#FFD65C";
-      this.ctx.moveTo(startX, startY);
-      this.ctx.lineTo(endX, endY);
+      this.ctx.moveTo(startPX, startPY);
+      this.ctx.lineTo(endPX, endPY);
       this.ctx.stroke();
     }
 
     drawBall(m, s) {
-      // Radius of the ball
-      const r = 10
-      const [pointX, pointY] = this.ballCoords(m, s, r)
+        const [pointPX, pointPY] = 
+            s ? this.ballCoords(m, s, ballDiameter).map(this.pixelCoord)
+              : [this.ballX, this.ballY].map(this.pixelCoord)
+
+        const r = this.pixelCoord(ballDiameter)
       console.log(`Ball distance: ${s}`)
-      console.log(`Ball coordinates: ${pointX}, ${pointY}`)
+      console.log(`Ball coordinates: ${pointPX}, ${pointPY}`)
       this.ctx.beginPath()
-      this.ctx.arc(pointX, pointY, r, r, 0, 2 * Math.PI, false)
+      this.ctx.arc(pointPX, pointPY, r, r, 0, 2 * Math.PI, false)
       this.ctx.fillStyle = "#FF0000"
       this.ctx.fill()
       // this.ctx.ellipse()
@@ -123,7 +163,7 @@ class Renderer {
         // Center (x, y) in mm
         let [cx, cy] = this.centerOfCanvas()
 
-        const coords = [cx - beamWidth/2, cy-(m),   cx + beamWidth/2, cy]
+        const coords = [cx - beamWidth/2, cy-m,   cx + beamWidth/2, cy]
         // const coords = [this.convertX(10), this.convertY(m), this.convertX(90), this.convertY(50)]
         console.log(`Beam physical coords: ${coords}`)
         return coords
@@ -136,8 +176,9 @@ class Renderer {
 
     // From chatGPT because I forgot trig
     // d is distance from the starting coordinates.
-    // r is the radius of the ball.
-    findPointOnLineWithBall(startX, startY, endX, endY, d, r) {
+    findPointOnLineWithBall(startX, startY, endX, endY, d) {
+        const r = ballDiameter / 2
+
       // Calculate the direction vector
       let dx = endX - startX;
       let dy = endY - startY;
@@ -169,12 +210,12 @@ class Renderer {
     // [x, y, radius]
     // as the GRAPHICAL coordinates in the canvas of the ball
     // r is radius of the ball
-    ballCoords(m, s, r) {
+    ballCoords(m, s) {
       // Start by getting the beam coordinates
       const [startX, startY, endX, endY] = this.beamCoords(m)
 
       // Find where the ball should go.
-      return this.findPointOnLineWithBall(startX, startY, endX, endY, s, r)
+      return this.findPointOnLineWithBall(startX, startY, endX, endY, s)
     }
 
     highlightDelete(i) {
