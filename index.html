@@ -259,6 +259,7 @@
         </div>-->
       </div>
     </div>
+    <script src="renderer.js"></script>
     <script>
       var sensorArray = [];
       var motorArray = [];
@@ -487,16 +488,16 @@
       const playCanvas = document.querySelector("#play-canvas-graph");
 
       trainGraph = new Graph(trainCanvas);
-      playGraph = new Graph(playCanvas);
+      playGraph = new Renderer(playCanvas, 'sim');
 
-      var t=0
-      setInterval(() => {
-        console.log("Triggered")
-        let variance = Math.sin(t/100)
-        console.log(`Variance: ${variance}`)
-        playGraph.redraw(50 + variance*25, variance*25 + 110)
-        t++
-      }, 12)
+      //var t=0
+      //setInterval(() => {
+      //  console.log("Triggered")
+      //  let variance = Math.sin(t/100)
+      //  console.log(`Variance: ${variance}`)
+      //  playGraph.redraw(50 + variance*25, variance*25 + 110)
+      //  t++
+      //}, 12)
 
       //trainGraph.redraw(-1);
       //playGraph.redraw(-1);
