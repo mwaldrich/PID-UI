@@ -945,15 +945,15 @@
           updateSensor(sensorVal);
 
           //update sensor value on graph
-          trainGraph.updateSensorVal(sensorVal);
-          playGraph.updateSensorVal(sensorVal);
+          // trainGraph.updateSensorVal(sensorVal);
+          // playGraph.updateSensorVal(sensorVal);
 
           //if in play/start mode
           if (lastJSON.hasOwnProperty("m") && lastJSON.hasOwnProperty("s")) {
             //go to motor value
             // moveMotor(lastJSON.m);
             //highlight nearest neighbor
-            playGraph.redraw(lastJSON);
+            playGraph.redraw(lastJSON.m, lastJSON.s);
           } else {
             // trainGraph.redraw(-1);
             //playGraph.redraw(-1);
