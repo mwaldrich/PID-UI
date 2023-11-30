@@ -5,14 +5,14 @@
 const beamWidth = 420//mm
 const beamHeight = 8.6//mm
 
-const ballDiameter = 40//mm
+const ballDiameter = 20//mm
 
 const viewportWidth = 450//mm
 const viewportHeight = 350//mm (yes, the viewport dimensions are in mm)
 
 // Scaling factors. These scalars relate the raw numbers from the sensors
 // into millimeters.
-const motorScale = /* 1mm = */ 0.06 /* unit(s) of motor movement */
+const motorScale = /* 1mm = */ 0.09 /* unit(s) of motor movement */
 const sensorScale = /* 1mm = */ 1 /* unit(s) of sensor movement */
 
 // The viewport scale relates each physical pixel to the size of a mm.
@@ -111,8 +111,11 @@ class Renderer {
 
       console.log("Render redraw.");
       console.log(`rawM=${rawM} rawS=${rawS}`)
-      const m = rawM / motorScale
-      const s = rawS / sensorScale
+      const m = rawM
+      if (rawS > 1500) {
+        rawS = 1500
+      }
+      let s = (rawS - 300) * (beamWidth / (1500 - 300))
       console.log(`m=${m} s=${s}`)
 
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -228,8 +231,8 @@ class Renderer {
 
       // Adjust the point to account for the radius of the ball
       // We need a vector perpendicular to (ndx, ndy). If (ndx, ndy) is normalized, then (-ndy, ndx) or (ndy, -ndx) are perpendicular to it.
-      pointX += ndy * r;
-      pointY += -ndx * r;
+      pointX -= ndy * r;
+      pointY -= -ndx * r;
 
       return [ pointX, pointY ];
     }
@@ -242,8 +245,8 @@ class Renderer {
       // Start by getting the beam coordinates
       const [startX, startY, endX, endY] = this.beamCoords(m)
 
-      // Find where the ball should go.
-      return this.findPointOnLineWithBall(startX, startY, endX, endY, s)
+      // Find where the ball should go. Flip the direction.
+      return this.findPointOnLineWithBall(endX, endY, startX, startY, s)
     }
 
     highlightDelete(i) {
