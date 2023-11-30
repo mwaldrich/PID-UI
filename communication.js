@@ -2,7 +2,7 @@ function msg(payload) {
     payload.datetime = new Date().getTime()
     payload.datetimeHuman = new Date().toString()
 
-    fetch(`https://${window.location.host}/pid-backend/`, 
+    fetch(`https://silicon.mwaldrich.io/pid-backend/`, 
           {method: 'POST', 
            headers: {"Content-Type": "application/json"}, 
            body: JSON.stringify(payload)})
