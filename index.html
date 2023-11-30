@@ -489,7 +489,7 @@
       const playCanvas = document.querySelector("#play-canvas-graph");
 
       trainGraph = new Graph(trainCanvas);
-      playGraph = new Renderer(playCanvas, 'sim');
+      playGraph = new Renderer(playCanvas, 'live');
 
       //var t=0
       //setInterval(() => {
@@ -874,6 +874,10 @@
         button.style.backgroundColor = "#4ACB67";
       }
 
+      function runLoop() {
+        
+      }
+
       function setupSerial() {
         if (window.pyrepl && window.pyrepl.isActive) {
           console.log("DEVICE CONNECTED: about to reboot");
@@ -881,7 +885,7 @@
           console.log("before load data");
           //loadData();
           console.log("after load data");
-          setInterval(runSerial, 150); // connected, start monitoring
+          setInterval(runSerial, 1000/60 /* 60hz */); // connected, start monitoring
         } else {
           setTimeout(setupSerial, 250);
         }
@@ -914,6 +918,11 @@
             dictionary["r"] = r;
             console.log(`PIDR CHANGED. PRINTING MSG: ${JSON.stringify(dictionary)}`)
             window.pyrepl.write = JSON.stringify(dictionary);
+
+            if (r == 1) {
+              // the user just clicked "start"
+              playGraph.startStop(r)
+            }
           }
           lastP = p
           lastI = i

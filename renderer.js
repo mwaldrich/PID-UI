@@ -2,10 +2,10 @@
 // All distances, diameters, radii, and other dimensions are strictly in
 // MILLIMETERS.
 
-const beamWidth = 200//mm
-const beamHeight = 5//mm
+const beamWidth = 420//mm
+const beamHeight = 8.6//mm
 
-const ballDiameter = 10//mm
+const ballDiameter = 40//mm
 
 const viewportWidth = 450//mm
 const viewportHeight = 350//mm (yes, the viewport dimensions are in mm)
@@ -31,6 +31,12 @@ class Renderer {
         this.ctx = this.canvas.getContext('2d')
         this.type = type
 
+        // Keep track of the replay data
+        this.replayData = null
+
+        // Should we be playing a replay rn?
+        this.playReplay = false
+
 
         // The current sensor and motor values
         this.s = null
@@ -50,6 +56,25 @@ class Renderer {
         }
     }
 
+    startStop(r) {
+        if (this.type == 'live') {
+            if (r == 1) {
+                // Clicked start
+                // this.beginRecord()
+            } else if (r == 0) {
+                // Clicked stop
+                // this.endRecord()
+            }
+        } else if (this.type == 'sim') {
+            if (r == 1) {
+                this.playReplay = true
+                this.runReplay()
+            } else {
+                this.playReplay = false
+            }
+        }
+    }
+
     // Runs a replay.
     // The sample replay, for now.
     runReplay() {
@@ -57,6 +82,9 @@ class Renderer {
         if (this.type != 'sim') {
             throw 'This should never happen.'
         }
+
+        // Stop the replay, if requested
+        if (!this.playReplay) return
 
         const replay = sampleReplayData
 
