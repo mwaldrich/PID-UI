@@ -260,6 +260,7 @@
       </div>
     </div>
     <script src="renderer.js"></script>
+    <script src="communication.js"></script>
     <script>
       var sensorArray = [];
       var motorArray = [];
@@ -842,9 +843,8 @@
 
       function startStop() {
         const button = document.getElementById("start");
-        let telemetry = {type: "click", button: "start/stop"}
         if (button.value == "Start") {
-          telemetry.newStatus = "start"
+          msg_clickedStart()
           var dictionary = {};
           dictionary["st"] = "p";
           dictionary["r"] = 1;
@@ -855,11 +855,10 @@
           button.value = "Stop";
           button.style.backgroundColor = "#FF5151";
         } else {
-          telemetry.newStatus = "stop"
+          msg_clickedStop()
           stop();
         }
         
-        fetch('https://silicon.mwaldrich.io/pid', {method: 'PUT', body: JSON.stringify(telemetry)})
       }
 
       function stop() {
