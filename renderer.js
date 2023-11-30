@@ -56,24 +56,24 @@ class Renderer {
         }
     }
 
-    startStop(r) {
-        if (this.type == 'live') {
-            if (r == 1) {
-                // Clicked start
-                // this.beginRecord()
-            } else if (r == 0) {
-                // Clicked stop
-                // this.endRecord()
-            }
-        } else if (this.type == 'sim') {
-            if (r == 1) {
-                this.playReplay = true
-                this.runReplay()
-            } else {
-                this.playReplay = false
-            }
-        }
-    }
+    //startStop(r) {
+    //    if (this.type == 'live') {
+    //        if (r == 1) {
+    //            // Clicked start
+    //            // this.beginRecord()
+    //        } else if (r == 0) {
+    //            // Clicked stop
+    //            // this.endRecord()
+    //        }
+    //    } else if (this.type == 'sim') {
+    //        if (r == 1) {
+    //            this.playReplay = true
+    //            this.runReplay()
+    //        } else {
+    //            this.playReplay = false
+    //        }
+    //    }
+    //}
 
     // Runs a replay.
     // The sample replay, for now.
