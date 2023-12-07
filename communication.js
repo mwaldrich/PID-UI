@@ -36,7 +36,7 @@ function msg(payload) {
     
     fetch(`https://silicon.mwaldrich.io/pid-backend/`, 
           {method: 'POST', 
-           headers: {"Content-Type": "application/json", "RequestMode": "no-cors"}, 
+           headers: {"Content-Type": "application/json"}, 
            body: JSON.stringify(payload)})
 }
 
