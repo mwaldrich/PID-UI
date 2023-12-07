@@ -33,11 +33,11 @@ function msg(payload) {
     payload.datetimeHuman = new Date().toString()
 
     console.log(`Sending message to backend: ${JSON.stringify(payload)}`)
-    /*
+    
     fetch(`https://silicon.mwaldrich.io/pid-backend/`, 
           {method: 'POST', 
            headers: {"Content-Type": "application/json"}, 
-           body: JSON.stringify(payload)})*/
+           body: JSON.stringify(payload)})
 }
 
 // Full replays
