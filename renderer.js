@@ -32,7 +32,9 @@ class Renderer {
         this.type = type
 
         // Keep track of the replay data
-        this.replayData = null
+        this.replayData = undefined
+
+        // Are we recording right now?
 
         // Should we be playing a replay rn?
         this.playReplay = false
@@ -56,24 +58,40 @@ class Renderer {
         }
     }
 
-    //startStop(r) {
-    //    if (this.type == 'live') {
-    //        if (r == 1) {
-    //            // Clicked start
-    //            // this.beginRecord()
-    //        } else if (r == 0) {
-    //            // Clicked stop
-    //            // this.endRecord()
-    //        }
-    //    } else if (this.type == 'sim') {
-    //        if (r == 1) {
-    //            this.playReplay = true
-    //            this.runReplay()
-    //        } else {
-    //            this.playReplay = false
-    //        }
-    //    }
-    //}
+    startStop(p, i, d, r) {
+        console.log(`startStop(${p}, ${i}, ${d}, ${r}). this.type=${this.type}`)
+        if (this.type == 'live') {
+            if (r == 1) {
+                // Clicked start
+                // this.beginRecord()
+                this.replayData = newReplayDataSkeleton(p, i, d)
+                console.log("Recording started")
+            } else if (r == 0) {
+                // Clicked stop
+                console.log("Recording stopped. Uploading data...")
+                msg_uploadReplay(this.replayData)
+                this.replayData = undefined
+            }
+        } else if (this.type == 'sim') {
+            if (r == 1) {
+                this.playReplay = true
+                this.runReplay()
+            } else {
+                this.playReplay = false
+            }
+        }
+    }
+
+    /* Process a message that looks like {m: Integer, s: Integer} */
+    process(message) {
+        // If we're currently recording...
+        if (this.replayData) {
+            // Add this frame
+            this.replayData.frames.push(message)
+        }
+
+        this.redraw(message.m, message.s)
+    }
 
     // Runs a replay.
     // The sample replay, for now.
@@ -111,7 +129,7 @@ class Renderer {
 
       console.log("Render redraw.");
       console.log(`rawM=${rawM} rawS=${rawS}`)
-      const m = rawM
+      const m = -rawM
       if (rawS > 1500) {
         rawS = 1500
       }
