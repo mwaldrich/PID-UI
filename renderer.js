@@ -60,6 +60,14 @@ class Renderer {
         this.ballY = null
         this.velocityX = null
         this.velocityY = null
+
+        // Download simulation.pak
+        fetch("./simulation.pak")
+            .then((res) => res.json())
+            .then((simPak) => {
+                this.simPak = simPak
+                console.log(`Successfully downloaded simpak! simpak has following keys: ${Object.keys(simPak)}`)
+        })
     }
 
     startStop(p, i, d, r) {
@@ -118,7 +126,32 @@ class Renderer {
     }
 
     initializeSimulationData(p, i, d) {
+        console.log(`RENDER: Initializing simulation p=${p} i=${i} d=${d}`)
+        console.log(`RENDER: simulation.pak: ${Object.keys(this.simPak)}`)
 
+        this.simulationData = this.findClosestSimPakEntry(p)
+
+        console.log(`RENDER: Chosen simulation run kp=${this.simulationData.p}`)
+    }
+
+    findClosestSimPakEntry(kp) {
+        // Convert the keys to an array of numbers
+        const keys = Object.keys(this.simPak).map(key => parseFloat(key.replace('kp', '')));
+    
+        // Find the key closest to kp
+        let closestKey = keys[0];
+        let minDifference = Math.abs(kp - closestKey);
+    
+        for (let i = 1; i < keys.length; i++) {
+            let difference = Math.abs(kp - keys[i]);
+            if (difference < minDifference) {
+                minDifference = difference;
+                closestKey = keys[i];
+            }
+        }
+    
+        // Return the value associated with the closest key
+        return this.simPak[`kp${closestKey.toFixed(2)}`];
     }
 
     // Runs a replay.

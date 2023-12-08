@@ -48,7 +48,7 @@
       <div class="responsive-flex">
         <div class="grid-container">
           <div id="motor-box" class="explore-box">
-            <h2>Proportional</h2>
+            <h2>Power</h2>
             <div id="motor-items" class="flex">
               <div id="explore-gauge" class="gauge">
                 <div class="gauge-body">
@@ -58,7 +58,6 @@
                 <h3 id="explore-motor-value" class="motor-value"></h3>
               </div>
               <div id="slider-items" class="flex-column">
-                <p class="motor-high">180</p>
                 <input
                   class="motor-slider-p"
                   type="range"
@@ -67,11 +66,10 @@
                   value="90"
                   oninput="setP(this.value)"
                 />
-                <p class="motor-low">0</p>
               </div>
             </div>
-            <h2>Integral</h2>
-            <div id="motor-items" class="flex">
+            <!-- <h2>Integral</h2> -->
+            <div style="display: none" id="motor-items" class="flex">
               <div id="explore-gauge" class="gauge">
                 <div class="gauge-body">
                   <div class="gauge-fill-i"></div>
@@ -92,8 +90,8 @@
                 <p class="motor-low">0</p>
               </div>
             </div>
-            <h2>Derivative</h2>
-            <div id="motor-items" class="flex">
+            <!-- <h2>Derivative</h2> -->
+            <div style="display: none" id="motor-items" class="flex">
               <div id="explore-gauge" class="gauge">
                 <div class="gauge-body">
                   <div class="gauge-fill-d"></div>
