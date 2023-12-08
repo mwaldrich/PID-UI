@@ -48,9 +48,9 @@ function msg_uploadReplay(replay) {
 
 // Clicks
 function msg_clickedStart(p, i, d) {
-    msg({type: "click", button: "start"})
+    msg({type: "click", button: "start", p: p, i: i, d: d})
 }
 
-function msg_clickedStop() {
-    msg({type: "click", button: "stop"})
+function msg_clickedStop(p, i, d) {
+    msg({type: "click", button: "stop", p: p, i: i, d: d})
 }
