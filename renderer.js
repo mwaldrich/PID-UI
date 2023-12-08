@@ -80,7 +80,7 @@ class Renderer {
             // 2. We were recording live from the robot. In that case,
             //    this.replayData != undefined. We need to call 
             //    `this.completeReplayAndSend()`.
-            if (this.playReplay == true) {
+            if (this.playReplay) {
                 console.log("RENDER: Simulation stopped.")
                 this.playReplay = false
                 this.frame = 0
@@ -96,7 +96,13 @@ class Renderer {
             this.runReplay()
         } else if (r == 1) {
             // User clicked "Start"/"Send to Robot".
-            // Start recording and rendering.
+            // Stop simulation if running, 
+            // start recording and rendering.
+            if (this.playReplay) {
+                console.log("RENDER: Simulation stopped.")
+                this.playReplay = false
+                this.frame = 0
+            }
             this.replayData = newReplayDataSkeleton(p, i, d)
             console.log("RENDER: Recording started")
         }
