@@ -257,7 +257,7 @@
       function startStop() {
         const button = document.getElementById("start");
         if (button.value == "Start") {
-          msg_clickedStart()
+          msg_clickedStart(getP(), getI(), getD())
           var dictionary = {};
           dictionary["st"] = "p";
           dictionary["r"] = 1;
@@ -268,7 +268,7 @@
           button.value = "Stop";
           button.style.backgroundColor = "#FF5151";
         } else {
-          msg_clickedStop()
+          msg_clickedStop(getP(), getI(), getD())
           stop();
         }
         
