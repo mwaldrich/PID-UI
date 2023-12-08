@@ -287,6 +287,18 @@
         }
       }
 
+      function lockPID() {
+        document.querySelector(".motor-slider-p").disabled = true
+        document.querySelector(".motor-slider-i").disabled = true
+        document.querySelector(".motor-slider-d").disabled = true
+      }
+
+      function unlockPID() {
+        document.querySelector(".motor-slider-p").disabled = false
+        document.querySelector(".motor-slider-i").disabled = false
+        document.querySelector(".motor-slider-d").disabled = false
+      }
+
       /* Called when the user is currently simulating, and chooses to
          send the command to robot */
       function sendToRobot() {
@@ -309,12 +321,12 @@
             sendButton.style.display = "inline-block"
 
             /* Disable the PID controls */
-            // lockPID()
+            lockPID()
           } else {
             msg_clickedStart(getP(), getI(), getD())
 
-            // /* Re */
-            // unlockPID()
+            /* Disable the PID controls */
+            lockPID()
           }
 
           //change the button text and color
@@ -323,6 +335,8 @@
         } else {
           msg_clickedStop(getP(), getI(), getD())
           stop();
+          /* Re-enable the PID controls */
+          unlockPID()
         }
         
       }
