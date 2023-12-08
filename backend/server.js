@@ -4,7 +4,7 @@ const fs = require('fs')
 
 const express = require('express')
 const app = express()
-app.use(express.json())
+app.use(express.json({limit: "1GB" /* ... */}))
 
 // Enable CORS, necessary to be AJAX'd from GitHub Pages
 app.use(function(req, res, next) {
@@ -45,6 +45,8 @@ function receiveMessage(req) {
         case 'replay':
             processReplay(msg)
             break;
+        default:
+            console.log(`unknown message type: ${msg.type}`)
     }
 }
 
@@ -53,11 +55,26 @@ function processClick(msg) {
     fs.appendFileSync("./telemetry/clicks.txt", JSON.stringify(msg) + "\n")
 }
 
+function getCurrentDateTime() {
+    const now = new Date();
+
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // JavaScript months are 0-based.
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+
+    return `${year}-${month}-${day} at ${hours}.${minutes}.${seconds}`;
+}
+
 function processReplay(msg) {
     // Write the replay to its own file
     const date = new Date()
 
-    const replayPath = `./telemetry/replays/Replay from ${date.getFullYear()}-${date.getMonth()+1}-${date.getDay()} at ${date.getHours()}.${date.getMinutes()}.${date.getSeconds()}`
+    const replayPath = `./telemetry/replays/Replay from ${getCurrentDateTime()}`
 
+    console.log(`Attempting to write replay to ${replayPath}`)
     fs.writeFileSync(replayPath, JSON.stringify(msg.replay))
+    console.log(`Finished writing replay to ${replayPath}`)
 }

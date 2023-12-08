@@ -19,6 +19,14 @@ const sensorScale = /* 1mm = */ 1 /* unit(s) of sensor movement */
 // Bump this up to increase the *quality* of the render.
 let viewportScale = 2//pixel(s)^2 = 1mm
 
+// How many seconds the ball should be in the center to be 
+// considered "balanced"
+const balanceSeconds = 3
+
+// Where the ball is considered to be "balanced"
+const balanceRangeStart = 600
+const balanceRangeEnd = 1000
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Actual rendering logic below
@@ -69,8 +77,7 @@ class Renderer {
             } else if (r == 0) {
                 // Clicked stop
                 console.log("Recording stopped. Uploading data...")
-                msg_uploadReplay(this.replayData)
-                this.replayData = undefined
+                this.completeReplayAndSend()
             }
         } else if (this.type == 'sim') {
             if (r == 1) {
@@ -91,6 +98,19 @@ class Renderer {
         }
 
         this.redraw(message.m, message.s)
+    }
+
+    /* Call this when we're doing recording a replay.
+       It will do some final processing and send it out. */
+    completeReplayAndSend() {
+      const balanced = this.replayData.frames.slice(-60 * balanceSeconds).every((frame) => {
+        return balanceRangeStart < frame.s && frame.s < balanceRangeEnd
+      })
+
+      this.replayData.balanced = balanced
+
+      msg_uploadReplay(this.replayData)
+      this.replayData = undefined
     }
 
     // Runs a replay.
