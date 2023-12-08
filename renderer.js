@@ -83,6 +83,7 @@ class Renderer {
             if (this.playReplay == true) {
                 console.log("RENDER: Simulation stopped.")
                 this.playReplay = false
+                this.frame = 0
             } else if (this.replayData != undefined) {
                 console.log("RENDER: Recording stopped. Uploading data...")
                 this.completeReplayAndSend()
