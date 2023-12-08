@@ -1,15 +1,3 @@
-// Retrieve device settings
-function fetchSettings() {
-    while (!document.cookie) {
-        enterSettings()
-    }
-    if (document.cookie) {
-        return JSON.parse(document.cookie.split('=')[1])
-    } else {
-        return {unitNumber: -1, group: undefined}
-    }
-}
-
 function newReplayDataSkeleton(p, i, d) {
     return {
         ...fetchSettings(),
@@ -47,6 +35,10 @@ function msg_uploadReplay(replay) {
 
 
 // Clicks
+function msg_clickedSimulate(p, i, d) {
+    msg({type: "click", button: "simulate", p: p, i: i, d: d})
+}
+
 function msg_clickedStart(p, i, d) {
     msg({type: "click", button: "start", p: p, i: i, d: d})
 }

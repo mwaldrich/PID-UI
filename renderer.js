@@ -34,18 +34,18 @@ const balanceRangeEnd = 1000
 class Renderer {
     // Construct a new renderer, rendering onto the given canvas `c`.
     // `type` should be 'live' or 'sim'
-    constructor(c, type) {
+    constructor(c) {
         this.canvas = c
         this.ctx = this.canvas.getContext('2d')
-        this.type = type
 
-        // Keep track of the replay data
+        // Keep track of the live data recorded from this robot
         this.replayData = undefined
-
-        // Are we recording right now?
 
         // Should we be playing a replay rn?
         this.playReplay = false
+
+        // The simulation data we are replaying
+        this.simulationData = undefined
 
 
         // The current sensor and motor values
@@ -60,32 +60,36 @@ class Renderer {
         this.ballY = null
         this.velocityX = null
         this.velocityY = null
-
-        if (type == 'sim') {
-            this.runReplay()
-        }
     }
 
     startStop(p, i, d, r) {
-        console.log(`startStop(${p}, ${i}, ${d}, ${r}). this.type=${this.type}`)
-        if (this.type == 'live') {
-            if (r == 1) {
-                // Clicked start
-                // this.beginRecord()
-                this.replayData = newReplayDataSkeleton(p, i, d)
-                console.log("Recording started")
-            } else if (r == 0) {
-                // Clicked stop
-                console.log("Recording stopped. Uploading data...")
+        console.log(`RENDER: startStop(${p}, ${i}, ${d}, ${r})`)
+
+        if (r == 0) {
+            // User clicked stop. There are 2 states we could have been in:
+            // 1. A simulation was currently running. In that case, 
+            //    this.playReplay === true.
+            // 2. We were recording live from the robot. In that case,
+            //    this.replayData != undefined. We need to call 
+            //    `this.completeReplayAndSend()`.
+            if (this.playReplay == true) {
+                console.log("RENDER: Simulation stopped.")
+                this.playReplay = false
+            } else if (this.replayData != undefined) {
+                console.log("RENDER: Recording stopped. Uploading data...")
                 this.completeReplayAndSend()
             }
-        } else if (this.type == 'sim') {
-            if (r == 1) {
-                this.playReplay = true
-                this.runReplay()
-            } else {
-                this.playReplay = false
-            }
+        } else if (r == 0.5) {
+            // User clicked simulate. Replay simulation data.
+            console.log("RENDER: Simulation started")
+            this.initializeSimulationData(p, i, d)
+            this.playReplay = true
+            this.runReplay()
+        } else if (r == 1) {
+            // User clicked "Start"/"Send to Robot".
+            // Start recording and rendering.
+            this.replayData = newReplayDataSkeleton(p, i, d)
+            console.log("RENDER: Recording started")
         }
     }
 
@@ -105,7 +109,7 @@ class Renderer {
     completeReplayAndSend() {
       const balanced = this.replayData.frames.slice(-60 * balanceSeconds).every((frame) => {
         return balanceRangeStart < frame.s && frame.s < balanceRangeEnd
-      })
+      }) && this.replayData.frames.length > (60 * balanceSeconds)
 
       this.replayData.balanced = balanced
 
@@ -113,18 +117,23 @@ class Renderer {
       this.replayData = undefined
     }
 
+    initializeSimulationData(p, i, d) {
+
+    }
+
     // Runs a replay.
     // The sample replay, for now.
     runReplay() {
-        // Only run a replay if the canvas type is 'sim'
-        if (this.type != 'sim') {
-            throw 'This should never happen.'
-        }
-
         // Stop the replay, if requested
         if (!this.playReplay) return
 
-        const replay = sampleReplayData
+        const replay = this.simulationData
+
+        if (!replay) {
+            alert("Attempted to play a simulation, but no simulation data was found.")
+            // throw "bug"
+            return
+        }
 
         const replayLength = replay.frames.length
 

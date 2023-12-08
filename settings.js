@@ -7,12 +7,14 @@ document.addEventListener('keyup', function(event) {
         enterSettings()
         // document.getElementById('settings-popup').style.display = 'block'
     }
+
+    // if (event.key == "." && event.ctrlKey)
 })
 
 // If the user entered nothing for the unit number, delete the cookie.
 function enterSettings() {
     const unitNumber = prompt("Please enter the unit #:")
-    const experiment = confirm("Should we enable simulation?")
+    const experiment = confirm("Should we enable simulation on this machine?")
 
 
     const payload = {unitNumber: unitNumber, group: experiment? "experiment" : "control"}
@@ -23,9 +25,17 @@ function enterSettings() {
     // it is a number.
     if (unitNumber != "") {
         console.log(`Cookie set.`)
-        document.cookie = `pidui-settings=${JSON.stringify(payload)}; path=/`
+        Cookies.set('pidui-settings', JSON.stringify(payload))
     } else {
         console.log(`Cookie deleted.`)
-        document.cookie = `pidui-settings=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`
+        Cookies.remove('pidui-settings')
     }
+}
+
+// Retrieve device settings
+function fetchSettings() {
+    while (Cookies.get('pidui-settings') == undefined) {
+        enterSettings()
+    }
+    return JSON.parse(Cookies.get('pidui-settings'))
 }

@@ -2,6 +2,11 @@
 
 ballbeam.py: backend for calculating PID and communicating through serial 
 
+## PID Values
+P: 0 -> .03 -> .05 -> .07 -> .10
+I: 0.00001
+D: 10
+
 ## Data Format
 Data from a run can be recorded and played back. Below is the description of this data format:
 

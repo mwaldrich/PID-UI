@@ -337,6 +337,10 @@ p {
   background-color: #4acb67;
 }
 
+#sendToRobot {
+  background-color: orange
+}
+
 #delete {
   background-color: #ff5151;
   height: 40px;
