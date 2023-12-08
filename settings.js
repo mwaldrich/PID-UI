@@ -2,13 +2,16 @@
 
 document.addEventListener('keyup', function(event) {
     if (event.key == '/' && event.ctrlKey) {
-        console.log('Ctrl+/ pressed. Entering settings.')
+        console.log('SETTINGS: Ctrl+/ pressed. Entering settings...')
 
         enterSettings()
         // document.getElementById('settings-popup').style.display = 'block'
     }
 
-    // if (event.key == "." && event.ctrlKey)
+    if (event.key == "." && event.ctrlKey) {
+        console.log("SETTINGS: Ctrl+. pressed. Entering manual PID values...")
+        enterManualPID()
+    }
 })
 
 // If the user entered nothing for the unit number, delete the cookie.
@@ -38,4 +41,14 @@ function fetchSettings() {
         enterSettings()
     }
     return JSON.parse(Cookies.get('pidui-settings'))
+}
+
+// Enter manual PID values
+function enterManualPID() {
+    const kp = prompt("Enter the RAW KP value")
+    //let i = prompt("Enter the RAW KI value")
+    //let d = prompt("Enter the RAW KD value")
+    const sliderPosition = kp / 0.1 * 180
+    console.log(`SETTINGS: Raw KP = ${kp}, slider position = ${sliderPosition}/180`)
+    setP(sliderPosition)
 }

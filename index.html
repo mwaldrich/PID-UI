@@ -242,6 +242,7 @@
       // NEW: Called when the user sets the Proportional value.
       function setP(val) {
         // Update the P gauge position
+        document.querySelector(".motor-slider-p").value = val
         document.querySelector(".gauge-fill-p").style.transform = `rotate(${val/360}turn)`
       }
       function getP() {
@@ -254,6 +255,7 @@
       // NEW: Called when the user sets the Integral value.
       function setI(val) {
         // Update the P gauge position
+        document.querySelector(".motor-slider-i").value = val
         document.querySelector(".gauge-fill-i").style.transform = `rotate(${val/360}turn)`
       }
       function getI() {
@@ -264,6 +266,7 @@
       // NEW: Called when the user sets the Derivative value.
       function setD(val) {
         // Update the P gauge position
+        document.querySelector(".motor-slider-d").value = val
         document.querySelector(".gauge-fill-d").style.transform = `rotate(${val/360}turn)`
       }
       function getD() {
