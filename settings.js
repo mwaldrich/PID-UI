@@ -1,15 +1,15 @@
 /* Add an event listener to listen for the keyboard shortcut: ALT-S */
 
 document.addEventListener('keyup', function(event) {
-    if (event.key == '/' && event.ctrlKey) {
-        console.log('SETTINGS: Ctrl+/ pressed. Entering settings...')
+    if (event.key == '.' && event.ctrlKey) {
+        console.log('SETTINGS: Ctrl+. pressed. Entering settings...')
 
         enterSettings()
         // document.getElementById('settings-popup').style.display = 'block'
     }
 
-    if (event.key == "." && event.ctrlKey) {
-        console.log("SETTINGS: Ctrl+. pressed. Entering manual PID values...")
+    if (event.key == "," && event.ctrlKey) {
+        console.log("SETTINGS: Ctrl+, pressed. Entering manual PID values...")
         enterManualPID()
     }
 })
