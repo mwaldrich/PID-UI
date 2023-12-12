@@ -11,6 +11,7 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css?family=Poppins:400,700,900"
     />
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
     <!-- CSS specific to this website -->
     <link rel="stylesheet" href="pid.css" />
   </head>
@@ -248,7 +249,7 @@
         const rawValue = document.querySelector(".motor-slider-p").value
         const scale = rawValue / 180 /* now between 0 and 1 */
 
-        return 0.1 * scale;
+        return 0.15 * scale;
       }
       // NEW: Called when the user sets the Integral value.
       function setI(val) {

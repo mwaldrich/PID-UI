@@ -48,7 +48,7 @@ function enterManualPID() {
     const kp = prompt("Enter the RAW KP value")
     //let i = prompt("Enter the RAW KI value")
     //let d = prompt("Enter the RAW KD value")
-    const sliderPosition = kp / 0.1 * 180
+    const sliderPosition = kp / 0.15 * 180
     console.log(`SETTINGS: Raw KP = ${kp}, slider position = ${sliderPosition}/180`)
     setP(sliderPosition)
 }
