@@ -78,6 +78,7 @@ class Renderer {
         console.log(`RENDER: startStop(${p}, ${i}, ${d}, ${r})`)
 
         this.confettiThrown = false
+        this.framesBalanced = 0
 
         if (r == 0) {
             // User clicked stop. There are 2 states we could have been in:

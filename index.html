@@ -411,7 +411,7 @@
           var i = getI();
           var d = getD();
           var r = getR();
-          // console.log(`PID r: ${p}, ${i}, ${d}, ${r}`)
+          console.log(`PID r: ${p}, ${i}, ${d}, ${r}`)
 
           if (didParamsChange(p, i, d, r)) {
             var dictionary = {};
@@ -434,7 +434,7 @@
           lastD = d
           lastR = r
 
-        if (lastMessage != undefined) {
+        if (lastMessage != undefined && r == 1) {
           playGraph.process(lastMessage)
         }
 
